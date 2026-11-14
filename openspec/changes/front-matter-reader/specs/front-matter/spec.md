@@ -35,7 +35,17 @@ A source whose first line opens no form, or whose block never closes, SHALL have
 #### Scenario: Windows line endings
 
 - **WHEN** the source is `---\r\ntitle: Install\r\n---\r\nBody\r\n`
-- **THEN** `find` gives a YAML block that ends after the second `---\r\n`, and the value of `title` has the text `Install`
+- **THEN** `find` gives a YAML block that ends after the second `---\r\n`, its content starts after the first `---\r\n`, and the value of `title` has the text `Install` and a span that holds no `\r`
+
+#### Scenario: A block scalar with Windows line endings
+
+- **WHEN** the source is `---\r\ndescription: |\r\n  a\r\n  b\r\n---\r\n`
+- **THEN** the value of `description` has the text `a\nb\n`
+
+#### Scenario: A closing fence at the end of the file
+
+- **WHEN** the source is `---\r\ntitle: Install\r\n---`, with no line ending after the closing fence
+- **THEN** `find` gives a YAML block that ends at the end of the source
 
 #### Scenario: A byte order mark
 

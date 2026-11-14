@@ -63,6 +63,10 @@ Alternative: one `is_string` flag. The caller folds the lines of each form diffe
 The first line of `source` names the block, with blanks allowed after the fence.
 A leading U+FEFF is skipped, and the block's span starts after it.
 A line ends with `\n` or `\r\n`, so a file saved on Windows reads the same.
+A span never splits a `\r\n` and never ends on a `\r`: `content` starts after the opening line's ending, `span` holds the closing line's ending, and a value's span stops before it.
+A closing line may end the file with no line ending, in either style.
+The text of a string holds `\n` for each line break, whatever the file uses.
+`Fault::line` counts the lines of `source`, so a byte order mark changes no line number.
 
 | First line | Format | Closing line |
 |:--|:--|:--|
