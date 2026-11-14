@@ -52,6 +52,11 @@ A source whose first line opens no form, or whose block never closes, SHALL have
 - **WHEN** the source is U+FEFF, then `---\ntitle: Install\n---\n`
 - **THEN** `find` gives a YAML block whose span starts at byte 3
 
+#### Scenario: A byte order mark before a bare object
+
+- **WHEN** the source is U+FEFF, then `{"title": "Install"}\nBody\n`
+- **THEN** `find` gives a JSON block whose span starts at byte 3
+
 #### Scenario: A block that never closes
 
 - **WHEN** the source is `---\ntitle: Install\nBody\n`

@@ -61,7 +61,7 @@ Alternative: one `is_string` flag. The caller folds the lines of each form diffe
 ### 3. Finding the block
 
 The first line of `source` names the block, with blanks allowed after the fence.
-A leading U+FEFF is skipped, and the block's span starts after it.
+A leading U+FEFF is skipped for every form, and the block's span starts after it.
 A line ends with `\n` or `\r\n`, so a file saved on Windows reads the same.
 A span never splits a `\r\n` and never ends on a `\r`: `content` starts after the opening line's ending, `span` holds the closing line's ending, and a value's span stops before it.
 A closing line may end the file with no line ending, in either style.
@@ -79,7 +79,7 @@ The text of a string holds `\n` for each line break, whatever the file uses.
 | a line that starts with `{` | JSON | the line where the object closes |
 
 A block whose closing line never comes is no block.
-For a bare object, `struson` reads one JSON value from the first byte.
+For a bare object, `struson` reads one JSON value from the first byte after any byte order mark.
 The block ends after the line that holds the value's last byte, so the object is its own fence.
 A bare object that `struson` cannot read to its end is no block, since nothing else marks where it ends.
 Decision 5 therefore holds only for the fenced forms.
