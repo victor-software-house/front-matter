@@ -205,6 +205,18 @@ fn a_list_and_a_mapping_span_their_whole_node() {
 }
 
 #[test]
+fn a_nested_value_that_ends_in_a_block_scalar_keeps_its_line_endings_out() {
+    let source = "---\nl:\n  - |\n    a\nz: 1\n---\n";
+    let list = values(source);
+    assert_eq!(&source[list[0].span.clone()], "- |\n    a");
+
+    let source = "---\r\nm:\r\n  k: >\r\n    a\r\n    b\r\n\r\nz: 1\r\n---\r\n";
+    let mapping = values(source);
+    assert_eq!(&source[mapping[0].span.clone()], "k: >\r\n    a\r\n    b");
+    assert_eq!(&source[mapping[1].span.clone()], "1");
+}
+
+#[test]
 fn nested_collections_are_one_value() {
     let source = "---\na:\n  - [1, {b: [2, 3]}]\n  - c: d\nz: end\n---\n";
     let values = values(source);
