@@ -61,6 +61,7 @@ The first line of `source` names the block, with blanks allowed after the fence:
 
 A block whose closing line never comes is no block.
 For a bare object, `struson` reads one JSON value from the first byte, and the block ends after the line that holds its last byte; the object is its own fence.
+A bare object that `struson` cannot read to its end is no block, since nothing else marks where it ends, so decision 5 holds only for the fenced forms.
 This is the set of [adrg/frontmatter][adrg], which Hugo and many static site tools share.
 
 ### 4. One parser per format
