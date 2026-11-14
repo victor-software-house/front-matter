@@ -44,7 +44,8 @@ A source whose first line opens no form, or whose block never closes, SHALL have
 
 ### Requirement: Read each top-level value
 
-`read` SHALL give, for each top-level key of the block in source order, its key, the byte span of the key, the byte span of the value as written, its `Style`, and its text when the value is a string.
+`read` SHALL give each top-level key of the block in source order.
+For each key it SHALL give the key, the byte span of the key, the byte span of the value as written, its `Style`, and its text when the value is a string.
 Every span SHALL be a range of the source, so `&source[span]` is the value as the file writes it.
 
 #### Scenario: A quoted YAML string

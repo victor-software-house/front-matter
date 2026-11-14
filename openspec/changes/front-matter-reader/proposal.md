@@ -4,6 +4,7 @@
 
 hakkiri lints the string values of a Markdown file's front matter, and reads them through a general config reader that reads JSON as YAML.
 A JSON block that YAML also reads, such as `{title: Install guide}`, then passes as front matter when it is no JSON.
+
 The operator ruled on 2026-11-13 that front matter is document content, read by one parser per format, and on 2026-11-14 that the reader lives in this crate so other tools can use it.
 
 ## What Changes
