@@ -54,6 +54,8 @@ Alternative: give the caller a tree of every nested value. hakkiri reads top-lev
 
 A YAML plain scalar that the core schema reads as a boolean, a null or a number is `Other`.
 The core schema reads a YAML date as a string, so it stays `Plain` with its text.
+
+An explicit `!!str` tag makes a plain scalar a string, and every other tag is read as if absent.
 A caller that follows another schema decides for itself.
 
 Alternative: one `is_string` flag. The caller folds the lines of each form differently, so it needs the form.

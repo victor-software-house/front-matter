@@ -88,6 +88,11 @@ Every span SHALL be a range of the source, so `&source[span]` is the value as th
 - **WHEN** the block holds `draft: true` and `tags: [a, b]`
 - **THEN** both values have style `Other` and no text
 
+#### Scenario: An explicit string tag
+
+- **WHEN** the block is `---\ncount: !!str 12\n---\n`
+- **THEN** the value of `count` has style `Plain` and the text `12`
+
 #### Scenario: A TOML multiline string
 
 - **WHEN** the block holds `summary = """\nOne.\n"""`
