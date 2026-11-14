@@ -125,7 +125,10 @@ impl Reader {
             if nested.accept(event, &range)
                 && let Some(done) = self.nested.take()
             {
-                self.finish(Style::Other, None, done.start..done.end);
+                // A block scalar at the end of the node ends in its line
+                // endings.
+                let end = source[..done.end].trim_end_matches(['\n', '\r']).len();
+                self.finish(Style::Other, None, done.start..end.max(done.start));
             }
             return Ok(());
         }
