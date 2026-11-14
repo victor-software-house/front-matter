@@ -91,7 +91,7 @@ Every span SHALL be a range of the source, so `&source[span]` is the value as th
 #### Scenario: A TOML multiline string
 
 - **WHEN** the block holds `summary = """\nOne.\n"""`
-- **THEN** the value has style `MultilineBasic` and the text `One.\n`
+- **THEN** the value has style `MultilineBasicString` and the text `One.\n`
 
 #### Scenario: A JSON string with an escape
 

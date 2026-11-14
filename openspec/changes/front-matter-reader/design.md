@@ -48,7 +48,7 @@ Alternative: give the caller a tree of every nested value. hakkiri reads top-lev
 | Format | Styles |
 |:--|:--|
 | YAML | `Plain`, `SingleQuoted`, `DoubleQuoted`, `Literal`, `Folded` |
-| TOML | `Basic`, `Literal`, `MultilineBasic`, `MultilineLiteral` |
+| TOML | `BasicString`, `LiteralString`, `MultilineBasicString`, `MultilineLiteralString` |
 | JSON | `String` |
 | any | `Other`, for a number, a boolean, a null, a TOML date, a list or a table |
 
