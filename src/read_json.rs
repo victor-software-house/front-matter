@@ -14,7 +14,7 @@ type Reader<'text> = JsonStreamReader<&'text [u8]>;
 pub(crate) fn read(source: &str, text: &str, base: usize) -> Result<Vec<Value>, Fault> {
     let mut reader = JsonStreamReader::new(text.as_bytes());
     let values = members(&mut reader, base)
-        .map_err(|error| Fault::at(source, base + offset(&reader), error.to_string()))?;
+        .map_err(|error| Fault::at(source, base + offset(&reader), describe(&error)))?;
     reader.consume_trailing_whitespace().map_err(|error| {
         let at = if let ReaderError::SyntaxError(syntax) = &error {
             syntax
@@ -24,9 +24,31 @@ pub(crate) fn read(source: &str, text: &str, base: usize) -> Result<Vec<Value>, 
         } else {
             None
         };
-        Fault::at(source, base + at.unwrap_or(text.len()), error.to_string())
+        Fault::at(source, base + at.unwrap_or(text.len()), describe(&error))
     })?;
     Ok(values)
+}
+
+/// What went wrong, without struson's own position, which counts lines from 0
+/// in the content. The fault holds the line of the source instead.
+fn describe(error: &ReaderError) -> String {
+    match error {
+        ReaderError::SyntaxError(syntax) => format!("JSON syntax error {}", syntax.kind),
+        ReaderError::UnexpectedValueType {
+            expected, actual, ..
+        } => format!("expected JSON value type {expected} but got {actual}"),
+        ReaderError::UnexpectedStructure { kind, .. } => {
+            format!("unexpected JSON structure {kind}")
+        }
+        ReaderError::MaxNestingDepthExceeded {
+            max_nesting_depth, ..
+        } => format!("maximum nesting depth {max_nesting_depth} exceeded"),
+        ReaderError::UnsupportedNumberValue { number, .. } => {
+            format!("unsupported number value '{number}'")
+        }
+        ReaderError::IoError { error, .. } => format!("IO error '{error}'"),
+        _ => error.to_string(),
+    }
 }
 
 /// The byte of the content where the reader is.

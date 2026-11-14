@@ -129,6 +129,28 @@ fn a_syntax_error_names_its_line() {
 }
 
 #[test]
+fn a_fault_message_holds_no_position_of_the_parser() {
+    let sources = [
+        ";;;\n{\"a\": \"b\"} 1\n;;;\n",
+        ";;;\n{title: Install}\n;;;\n",
+        ";;;\n[1]\n;;;\n",
+        ";;;\n{\n  \"a\": 1,\n  \"b\": ,\n}\n;;;\n",
+        ";;;\n{\"a\": 1,}\n;;;\n",
+        ";;;\n;;;\n",
+    ];
+    for source in sources {
+        let message = fault(source).message;
+        assert!(!message.is_empty(), "{source:?} has no message");
+        for position in ["line 0", "line", "column", "data pos", "path"] {
+            assert!(
+                !message.contains(position),
+                "{source:?} gives {message:?}, which holds {position:?}"
+            );
+        }
+    }
+}
+
+#[test]
 fn a_byte_order_mark_changes_no_line() {
     assert_eq!(
         fault("\u{feff};;;\n{\n\"é\": 1,\n\"b\": ,\n}\n;;;\n").line,
