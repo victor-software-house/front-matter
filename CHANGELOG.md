@@ -1,5 +1,12 @@
 # Changelog
 
+## front-matter 0.0.2
+
+### Fixed
+
+- A YAML key that is a list, a mapping or an alias, such as `? [a, b]`, no longer makes `read` fail.
+  Its entry gives no value, and the entries after it are read ([`e7f570d`](https://github.com/victor-software-house/front-matter/commit/e7f570d4758c50298034c5fff3cade601e2acfad)).
+
 ## front-matter 0.0.1
 
 ### Added
