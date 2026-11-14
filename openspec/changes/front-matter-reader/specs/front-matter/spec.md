@@ -32,6 +32,16 @@ A source whose first line opens no form, or whose block never closes, SHALL have
 - **WHEN** the source is `{\n  "title": "Install"\n}\nBody\n`
 - **THEN** `find` gives a JSON block that ends after the line holding the closing brace
 
+#### Scenario: Windows line endings
+
+- **WHEN** the source is `---\r\ntitle: Install\r\n---\r\nBody\r\n`
+- **THEN** `find` gives a YAML block that ends after the second `---\r\n`, and the value of `title` has the text `Install`
+
+#### Scenario: A byte order mark
+
+- **WHEN** the source is U+FEFF, then `---\ntitle: Install\n---\n`
+- **THEN** `find` gives a YAML block whose span starts at byte 3
+
 #### Scenario: A block that never closes
 
 - **WHEN** the source is `---\ntitle: Install\nBody\n`
@@ -76,6 +86,11 @@ Every span SHALL be a range of the source, so `&source[span]` is the value as th
 ### Requirement: One parser per format
 
 Each format SHALL be read only by its own parser: YAML by `granit-parser`, TOML by `toml`, and JSON by `struson`.
+
+#### Scenario: Data after a fenced JSON object
+
+- **WHEN** the block is `;;;\n{"a": "b"} 1\n;;;\n`
+- **THEN** `read` gives a fault on line 2
 
 #### Scenario: YAML flow syntax in a JSON block
 

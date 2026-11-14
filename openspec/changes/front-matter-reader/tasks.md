@@ -3,7 +3,7 @@
 ## 1. Find
 
 - [ ] 1.1 Add `Format`, `Block` and `find` for every form of design decision 3, the bare object read by `struson`.
-  Verify: a test per form, and the no-block cases of the spec, check the spans against the input.
+  Verify: a test per form, the line-ending and byte-order-mark cases, and the no-block cases of the spec check the spans against the input.
 
 ## 2. Read
 

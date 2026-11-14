@@ -60,7 +60,9 @@ Alternative: one `is_string` flag. The caller folds the lines of each form diffe
 
 ### 3. Finding the block
 
-The first line of `source` names the block, with blanks allowed after the fence:
+The first line of `source` names the block, with blanks allowed after the fence.
+A leading U+FEFF is skipped, and the block's span starts after it.
+A line ends with `\n` or `\r\n`, so a file saved on Windows reads the same.
 
 | First line | Format | Closing line |
 |:--|:--|:--|
@@ -77,6 +79,8 @@ For a bare object, `struson` reads one JSON value from the first byte.
 The block ends after the line that holds the value's last byte, so the object is its own fence.
 A bare object that `struson` cannot read to its end is no block, since nothing else marks where it ends.
 Decision 5 therefore holds only for the fenced forms.
+Only blanks may follow a bare object on its last line, or there is no block.
+In a fenced JSON block, `read` allows only whitespace after the object (`consume_trailing_whitespace`), and any other data is a fault.
 
 This is the set of [adrg/frontmatter][adrg], which Hugo and many static site tools share.
 
