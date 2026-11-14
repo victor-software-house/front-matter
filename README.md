@@ -2,9 +2,9 @@
 
 The front matter of a Markdown or MDX file: the YAML, TOML or JSON block at its top.  
 front-matter finds the block, reads it with a parser of its format, and gives each top-level value its key, its byte span in the file, and its text.  
-It is a Rust library, not a command.
+It is a Rust library with no command.
 
-## What it reads
+## Blocks
 
 The first release is planned to read these blocks:
 
