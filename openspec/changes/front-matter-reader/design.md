@@ -35,7 +35,7 @@ pub struct Fault { pub line: usize, pub message: String }
 
 `span` of a `Block` covers the fences, and `content` the bytes between them.
 Every span is a byte range of `source`.
-`Value::span` is the value as written: a quoted string with its quotes, a block scalar with its header line.
+`Value::span` is the value as written: a quoted string with its quotes, a block scalar or a TOML table with its header line.
 `text` is the string with its escapes resolved, or `None` when the value is no string.
 `Fault::line` counts from 1 in `source`.
 
