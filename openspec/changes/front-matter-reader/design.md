@@ -66,7 +66,9 @@ A line ends with `\n` or `\r\n`, so a file saved on Windows reads the same.
 A span never splits a `\r\n` and never ends on a `\r`: `content` starts after the opening line's ending, `span` holds the closing line's ending, and a value's span stops before it.
 A closing line may end the file with no line ending, in either style.
 The text of a string holds `\n` for each line break, whatever the file uses.
-`Fault::line` counts the lines of `source`, so a byte order mark changes no line number.
+A lone `\r` ends no line for `find`, so a fence line ends with `\n` or `\r\n`.
+Inside the content, each parser reads a lone `\r` by its own format's rules.
+`Fault::line` counts the `\n` before the fault's byte in `source`, so a byte order mark changes no line number.
 
 | First line | Format | Closing line |
 |:--|:--|:--|
