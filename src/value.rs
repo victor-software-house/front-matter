@@ -9,7 +9,8 @@ use crate::{Block, Format, read_json, read_toml, read_yaml};
 /// How a value is written in the file.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Style {
-    /// A YAML plain scalar that the core schema reads as a string.
+    /// A YAML plain scalar that the core schema reads as a string, or that an
+    /// explicit `!!str` tag marks as one.
     Plain,
     /// A YAML scalar in single quotes.
     SingleQuoted,
@@ -20,18 +21,19 @@ pub enum Style {
     /// A YAML block scalar that starts with `>`.
     Folded,
     /// A TOML string in double quotes.
-    Basic,
+    BasicString,
     /// A TOML string in single quotes.
     LiteralString,
     /// A TOML string in triple double quotes.
-    MultilineBasic,
+    MultilineBasicString,
     /// A TOML string in triple single quotes.
-    MultilineLiteral,
+    MultilineLiteralString,
     /// A JSON string.
     String,
     /// A value that is no string: a number, a boolean, a null, a TOML date, a
     /// list or a table. A YAML plain scalar that the core schema reads as a
-    /// boolean, a null or a number is also `Other`.
+    /// boolean, a null or a number is also `Other`, unless an explicit `!!str`
+    /// tag marks it as a string.
     Other,
 }
 

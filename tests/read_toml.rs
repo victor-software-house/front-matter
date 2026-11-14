@@ -34,10 +34,18 @@ fn each_string_form_has_its_style() {
     assert_eq!(
         found,
         [
-            (Style::Basic, "\"a\\tb é\"", "a\tb é"),
+            (Style::BasicString, "\"a\\tb é\"", "a\tb é"),
             (Style::LiteralString, "'a\\tb'", "a\\tb"),
-            (Style::MultilineBasic, "\"\"\"\nOne.\n\"\"\"", "One.\n"),
-            (Style::MultilineLiteral, "'''\nOne.\\n\n'''", "One.\\n\n"),
+            (
+                Style::MultilineBasicString,
+                "\"\"\"\nOne.\n\"\"\"",
+                "One.\n"
+            ),
+            (
+                Style::MultilineLiteralString,
+                "'''\nOne.\\n\n'''",
+                "One.\\n\n"
+            ),
         ]
     );
 }
@@ -46,7 +54,7 @@ fn each_string_form_has_its_style() {
 fn a_multiline_string() {
     let source = "+++\nsummary = \"\"\"\nOne.\n\"\"\"\n+++\n";
     let values = values(source);
-    assert_eq!(values[0].style, Style::MultilineBasic);
+    assert_eq!(values[0].style, Style::MultilineBasicString);
     assert_eq!(values[0].text.as_deref(), Some("One.\n"));
 }
 

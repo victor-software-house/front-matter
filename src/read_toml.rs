@@ -59,8 +59,10 @@ fn string_text(
     style: &Style,
     offset: usize,
 ) -> Result<String, Fault> {
-    if !matches!(style, Style::MultilineBasic | Style::MultilineLiteral)
-        || !written.contains("\r\n")
+    if !matches!(
+        style,
+        Style::MultilineBasicString | Style::MultilineLiteralString
+    ) || !written.contains("\r\n")
     {
         return Ok(parsed.to_owned());
     }
@@ -77,12 +79,12 @@ fn string_text(
 /// The style of a string, from the first bytes of its span.
 fn string_style(written: &str) -> Style {
     if written.starts_with("\"\"\"") {
-        Style::MultilineBasic
+        Style::MultilineBasicString
     } else if written.starts_with("'''") {
-        Style::MultilineLiteral
+        Style::MultilineLiteralString
     } else if written.starts_with('\'') {
         Style::LiteralString
     } else {
-        Style::Basic
+        Style::BasicString
     }
 }

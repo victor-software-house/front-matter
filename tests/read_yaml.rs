@@ -158,6 +158,29 @@ fn a_quoted_scalar_is_a_string_whatever_it_holds() {
 }
 
 #[test]
+fn an_explicit_string_tag_makes_a_plain_scalar_a_string() {
+    let source = "---\na: !!str true\nb: !<tag:yaml.org,2002:str> 12\nc: !!str\n---\n";
+    let values = values(source);
+    for (value, text) in values.iter().zip(["true", "12", ""]) {
+        assert_eq!(value.style, Style::Plain);
+        assert_eq!(value.text.as_deref(), Some(text));
+    }
+    assert_eq!(&source[values[0].span.clone()], "true");
+}
+
+#[test]
+fn every_other_tag_is_read_as_if_absent() {
+    let source = "---\na: !!int 12\nb: !custom foo\nc: !custom 12\nd: !!null x\n---\n";
+    let values = values(source);
+    assert_eq!(values[0].style, Style::Other);
+    assert_eq!(values[1].style, Style::Plain);
+    assert_eq!(values[1].text.as_deref(), Some("foo"));
+    assert_eq!(values[2].style, Style::Other);
+    assert_eq!(values[3].style, Style::Plain);
+    assert_eq!(values[3].text.as_deref(), Some("x"));
+}
+
+#[test]
 fn a_value_that_is_missing() {
     let source = "---\nempty:\nnext: x\n---\n";
     let values = values(source);

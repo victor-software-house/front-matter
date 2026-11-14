@@ -137,8 +137,11 @@ impl Reader {
             } else if is_node(event) {
                 return Err(Fault::at(source, range.start, "a key must be a scalar"));
             }
-        } else if let Event::Scalar(text, style, ..) = event {
-            let (style, text) = scalar(text, *style);
+        } else if let Event::Scalar(text, style, _, tag) = event {
+            let explicit_string = tag
+                .as_ref()
+                .is_some_and(|tag| tag.core_suffix() == Some("str"));
+            let (style, text) = scalar(text, *style, explicit_string);
             let range = match (&style, &self.key) {
                 (Style::Literal | Style::Folded, Some((_, key_span))) => {
                     block_scalar_span(source, key_span.end, range)
@@ -216,7 +219,9 @@ fn is_node(event: &Event<'_>) -> bool {
 }
 
 /// The style and the text of a scalar value.
-fn scalar(text: &str, style: ScalarStyle) -> (Style, Option<String>) {
+/// An explicit `!!str` tag makes a plain scalar a string, and any other tag is
+/// read as if absent.
+fn scalar(text: &str, style: ScalarStyle, explicit_string: bool) -> (Style, Option<String>) {
     let style = match style {
         ScalarStyle::Plain => Style::Plain,
         ScalarStyle::SingleQuoted => Style::SingleQuoted,
@@ -224,7 +229,7 @@ fn scalar(text: &str, style: ScalarStyle) -> (Style, Option<String>) {
         ScalarStyle::Literal => Style::Literal,
         ScalarStyle::Folded => Style::Folded,
     };
-    if style == Style::Plain && is_core_non_string(text) {
+    if style == Style::Plain && !explicit_string && is_core_non_string(text) {
         (Style::Other, None)
     } else {
         (style, Some(text.to_owned()))
