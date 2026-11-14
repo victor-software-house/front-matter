@@ -18,8 +18,11 @@
 
 ## 3. Suite and docs
 
-- [ ] 3.1 Add the JSONTestSuite cases under `tests/json-suite/` with the suite's MIT notice, each read inside a `;;;` block, since a bare object that fails is no block.
-  Verify: each `y_` object case reads, and each `n_` case gives a fault.
+- [ ] 3.1 Add the JSONTestSuite cases under `tests/json-suite/` with the suite's MIT notice.
+  The cases are the `y_object_*` files, and the `n_object_*` and `n_structure_*` files whose top level opens with `{`.
+  Each is read as `;;;\n<case>\n;;;\n`, since a bare object that fails is no block, so a case starts on line 2.
+  A case that is not UTF-8 is skipped, because `find` takes `&str`, and the suite's README lists it.
+  Verify: each `y_` case reads, and each `n_` case gives a fault.
 - [ ] 3.2 Document the interface in the crate doc and the README, with one example per format.
   Verify: `test:doc` runs the examples in CI.
 - [ ] 3.3 Add a `.changeset/` fragment for the first release.
