@@ -6,7 +6,7 @@ It is a Rust library with no command.
 
 ## Blocks
 
-The first release is planned to read these blocks:
+front-matter reads these blocks, after an optional byte order mark:
 
 - YAML between `---` lines, or between `---yaml` and `---`, closed by `---` or `...`.
 - TOML between `+++` lines, or between `---toml` and `---`.

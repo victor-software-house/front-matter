@@ -31,6 +31,9 @@ deny = [
     { crate = "openssl", reason = "TLS is rustls" },
     { crate = "native-tls", reason = "TLS is rustls" },
 ]
+skip = [
+    { crate = "syn@2", reason = "struson 0.7.2 needs strum_macros 0.27 and duplicate 2, which require syn 2; strum_macros 0.28.0, the latest, still does" },
+]
 
 # Declarations repeated outside [workspace.dependencies], and unused entries.
 [bans.workspace-dependencies]

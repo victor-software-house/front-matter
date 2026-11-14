@@ -14,6 +14,11 @@ include = ["src/**", "README.md", "LICENSE-*", "Cargo.toml"]
 all-features = true
 rustdoc-args = ["--cap-lints", "warn"]
 
+[dependencies]
+granit-parser = "2.1.0"
+struson = "0.7.2"
+toml = { version = "1.2.1", default-features = false, features = ["parse"] }
+
 [lints.rust]
 # deny instead of forbid, because forbid refuses the item-level
 # #[expect(unsafe_code, reason = "...")] that a justified exception carries.

@@ -35,7 +35,7 @@ pub struct Fault { pub line: usize, pub message: String }
 
 `span` of a `Block` covers the fences, and `content` the bytes between them.
 Every span is a byte range of `source`.
-`Value::span` is the value as written: a quoted string with its quotes, a block scalar with its header line.
+`Value::span` is the value as written: a quoted string with its quotes, a block scalar or a TOML table with its header line.
 `text` is the string with its escapes resolved, or `None` when the value is no string.
 `Fault::line` counts from 1 in `source`.
 
@@ -48,12 +48,14 @@ Alternative: give the caller a tree of every nested value. hakkiri reads top-lev
 | Format | Styles |
 |:--|:--|
 | YAML | `Plain`, `SingleQuoted`, `DoubleQuoted`, `Literal`, `Folded` |
-| TOML | `Basic`, `Literal`, `MultilineBasic`, `MultilineLiteral` |
+| TOML | `BasicString`, `LiteralString`, `MultilineBasicString`, `MultilineLiteralString` |
 | JSON | `String` |
 | any | `Other`, for a number, a boolean, a null, a TOML date, a list or a table |
 
 A YAML plain scalar that the core schema reads as a boolean, a null or a number is `Other`.
 The core schema reads a YAML date as a string, so it stays `Plain` with its text.
+
+An explicit `!!str` tag makes a plain scalar a string, and every other tag is read as if absent.
 A caller that follows another schema decides for itself.
 
 Alternative: one `is_string` flag. The caller folds the lines of each form differently, so it needs the form.
