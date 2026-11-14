@@ -274,8 +274,13 @@ fn a_top_level_scalar() {
 }
 
 #[test]
-fn a_key_that_is_a_list() {
-    assert_eq!(fault("---\n? [a, b]\n: c\n---\n").line, 2);
+fn an_entry_whose_key_is_no_scalar_gives_no_value() {
+    let source = "---\n&n name: 1\n? [a, b]\n: c\n? {k: v}\n: [d]\n? - e\n: |\n  text\n*n : f\ntitle: Install\n---\n";
+    let values = values(source);
+    let keys: Vec<&str> = values.iter().map(|value| value.key.as_str()).collect();
+    assert_eq!(keys, ["name", "title"]);
+    assert_eq!(values[1].text.as_deref(), Some("Install"));
+    assert_eq!(&source[values[1].span.clone()], "Install");
 }
 
 #[test]

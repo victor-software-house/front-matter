@@ -76,6 +76,7 @@ A source whose first line opens no form, or whose block never closes, SHALL have
 `read` SHALL give each top-level key of the block in source order.
 For each key it SHALL give the key, the byte span of the key, the byte span of the value as written, its `Style`, and its text when the value is a string.
 Every span SHALL be a range of the source, so `&source[span]` is the value as the file writes it.
+A YAML key that is a list, a mapping or an alias holds no name, so its entry SHALL give no value, and the entries after it SHALL be read.
 
 #### Scenario: A quoted YAML string
 
@@ -106,6 +107,11 @@ Every span SHALL be a range of the source, so `&source[span]` is the value as th
 
 - **WHEN** the block is `;;;\n{"title": "Tab\\there"}\n;;;\n`
 - **THEN** the value has style `String`, a span with its quotes, and the text with a tab
+
+#### Scenario: A YAML key that is no scalar
+
+- **WHEN** the block holds `? [a, b]\n: c\ntitle: Install\n`
+- **THEN** `read` gives one value, `title`, and no fault
 
 ### Requirement: One parser per format
 

@@ -42,9 +42,21 @@ enum Phase {
     After,
 }
 
-/// A list or a mapping that is the value of a top-level key.
+/// A key of the top-level mapping that waits for its value.
+#[derive(Debug)]
+enum Key {
+    /// A scalar key: its text and its bytes.
+    Named(String, Range<usize>),
+    /// A key that is a list, a mapping or an alias.
+    /// It holds no name, so its entry gives no value.
+    Unnamed,
+}
+
+/// A list or a mapping that is a top-level key or the value of one.
 #[derive(Debug)]
 struct Nested {
+    /// Whether the node is a key, whose entry gives no value.
+    key: bool,
     /// The first byte of the node.
     start: usize,
     /// The byte after the last byte read of the node.
@@ -54,6 +66,16 @@ struct Nested {
 }
 
 impl Nested {
+    /// A node that starts with the event at `range`.
+    fn new(key: bool, style: StructureStyle, range: &Range<usize>) -> Self {
+        Self {
+            key,
+            start: range.start,
+            end: range.end,
+            flow: vec![style == StructureStyle::Flow],
+        }
+    }
+
     /// Takes an event inside the node, and tells whether the node is complete.
     /// A flow collection ends at its closing bracket, and a block collection
     /// ends where its last scalar does.
@@ -81,8 +103,8 @@ struct Reader {
     /// Where the reader is.
     phase: Phase,
     /// The key that waits for its value.
-    key: Option<(String, Range<usize>)>,
-    /// The list or mapping that is the value of that key.
+    key: Option<Key>,
+    /// The list or mapping being read, a key or the value of one.
     nested: Option<Nested>,
 }
 
@@ -109,36 +131,42 @@ impl Reader {
                 }
                 Ok(())
             }
-            Phase::Inside => self.inside(source, event, range),
+            Phase::Inside => {
+                self.inside(source, event, range);
+                Ok(())
+            }
             Phase::After => Ok(()),
         }
     }
 
     /// Takes an event of the top-level mapping.
-    fn inside(
-        &mut self,
-        source: &str,
-        event: &Event<'_>,
-        range: Range<usize>,
-    ) -> Result<(), Fault> {
+    /// A key that is no scalar is read to its end, and its entry gives no
+    /// value.
+    fn inside(&mut self, source: &str, event: &Event<'_>, range: Range<usize>) {
         if let Some(nested) = self.nested.as_mut() {
             if nested.accept(event, &range)
                 && let Some(done) = self.nested.take()
             {
-                // A block scalar at the end of the node ends in its line
-                // endings.
-                let end = source[..done.end].trim_end_matches(['\n', '\r']).len();
-                self.finish(Style::Other, None, done.start..end.max(done.start));
+                if done.key {
+                    self.key = Some(Key::Unnamed);
+                } else {
+                    // A block scalar at the end of the node ends in its line
+                    // endings.
+                    let end = source[..done.end].trim_end_matches(['\n', '\r']).len();
+                    self.finish(Style::Other, None, done.start..end.max(done.start));
+                }
             }
-            return Ok(());
+            return;
         }
         if matches!(event, Event::MappingEnd) {
             self.phase = Phase::After;
         } else if self.key.is_none() {
             if let Event::Scalar(text, ..) = event {
-                self.key = Some((text.to_string(), range));
-            } else if is_node(event) {
-                return Err(Fault::at(source, range.start, "a key must be a scalar"));
+                self.key = Some(Key::Named(text.to_string(), range));
+            } else if matches!(event, Event::Alias(_)) {
+                self.key = Some(Key::Unnamed);
+            } else if let Event::SequenceStart(style, ..) | Event::MappingStart(style, ..) = event {
+                self.nested = Some(Nested::new(true, *style, &range));
             }
         } else if let Event::Scalar(text, style, _, tag) = event {
             let explicit_string = tag
@@ -146,7 +174,7 @@ impl Reader {
                 .is_some_and(|tag| tag.core_suffix() == Some("str"));
             let (style, text) = scalar(text, *style, explicit_string);
             let range = match (&style, &self.key) {
-                (Style::Literal | Style::Folded, Some((_, key_span))) => {
+                (Style::Literal | Style::Folded, Some(Key::Named(_, key_span))) => {
                     block_scalar_span(source, key_span.end, range)
                 }
                 _ => range,
@@ -155,18 +183,14 @@ impl Reader {
         } else if matches!(event, Event::Alias(_)) {
             self.finish(Style::Other, None, range);
         } else if let Event::SequenceStart(style, ..) | Event::MappingStart(style, ..) = event {
-            self.nested = Some(Nested {
-                start: range.start,
-                end: range.end,
-                flow: vec![*style == StructureStyle::Flow],
-            });
+            self.nested = Some(Nested::new(false, *style, &range));
         }
-        Ok(())
     }
 
     /// Completes the value of the waiting key.
+    /// The value of an unnamed key is dropped.
     fn finish(&mut self, style: Style, text: Option<String>, span: Range<usize>) {
-        if let Some((key, key_span)) = self.key.take() {
+        if let Some(Key::Named(key, key_span)) = self.key.take() {
             self.values.push(Value {
                 key,
                 key_span,
