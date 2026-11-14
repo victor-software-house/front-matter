@@ -1,6 +1,6 @@
 [package]
 name = "front-matter"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2024"
 rust-version = "1.100.0"
 description = "The front matter of Markdown and MDX files: a YAML, TOML or JSON block, with each value's key, byte span and text"
